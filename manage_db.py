@@ -4,8 +4,10 @@ Created on Thu Oct 17 10:26:21 2019
 
 @author: Matan
 """
-###need to add data_dict
-def manage_db(uid,action,exp_metadata):
+###exp_data structure:
+#    list of tuples: ("dict_name",JSON_dict)
+
+def manage_db(uid,action,exp_data,exp_metadata):
     from validate_data import validate_data
     from update_tool import update_tool
     from insert_tool import insert_tool
@@ -18,13 +20,13 @@ def manage_db(uid,action,exp_metadata):
         
     mycursor = mydb.cursor()
     
-    #Global parameter
+    #Global parameters
     mycursor.execute("SELECT subject_id_g FROM tb_subjects ORDER BY subject_id_g DESC LIMIT 1;")
     subject_id_g_new = mycursor.fetchall()[0][0] 
     
     try:
         ###need to add data_dict
-        validate_data(uid,mycursor)
+        validate_data(uid,exp_data,mycursor,mydb)
     except:
         mycursor.close()
         mydb.close()
