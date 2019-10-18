@@ -4,147 +4,16 @@ Created on Wed Oct 16 18:05:30 2019
 
 @author: Matan
 """
-def make_df(path): 
-        import pandas as pd
-        return pd.read_csv(path)
-
-def only_numerics(seq):
-    seq_type= type(seq)
-    return seq_type().join(filter(seq_type.isdigit, seq))
-
-def is_space(word):
-    for i in word:
-        if i==" ":
-            return False
-    return True
-
-def correct_idn(idn):
-    import regex as re
-    return re.match(r'^([0-9]{9})+$', str(idn))
-
-def correct_id(id):
-    import regex as re
-    import math
-    
-    if type(id) == str:
-        if id == "":
-            return False
-        elif type(id) == int or type(id) == float:
-            if id == None:
-                return False
-        elif type(id).__module__ == 'numpy' and math.isnan(id):
-            return False
-
-    return re.match(r'^[0-9]+$', str(id))
-
-def validate_type(id_or_idn, df, file_name):
-    import math
-        
-    if id_or_idn == "id":
-        l = df['subject_id']
-    else:
-        l = df['subject_id_number']
-
-    for j in range(0, len(l)):
-        
-        idn = l[j]
-        
-        if (type(idn) == str) and not(idn==""):
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                    raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
-        
-        elif (type(idn).__module__ == 'numpy') and not(math.isnan(idn)):
-            idn = int(idn.item())
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
-                
-        elif type(idn) == float and not(idn==None):
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
-                
-        elif type(idn) == int and not(idn==None):
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
- 
-        elif (type(idn) == int and (idn==None)) or (type(idn) == float and (idn==None)) or ((type(idn).__module__ == 'numpy') and math.isnan(idn)) or ((type(idn) == str) and not(idn=="")):
-            if id_or_idn == "id":
-                raise SystemExit("Some ID numbers' in " + str(file_name) + " type are empty or unrecognized") ###logger                  
-
-        else:
-            try:
-                l[j] = int(l[j])
-            except ValueError:
-                raise SystemExit("Some ID numbers' in " + str(file_name) + " type are empty or unrecognized") ###logger
-
-def generate_rand(nrows, existing_numbers):
-# This function gets less effective as the existing numbers list gets bigger. You should consider changing it to a more efficient one
-    import random
-    new_ids = []
-    for i in range(0,nrows):
-        rand_number=random.randrange(100000000,999999999,1)
-        is_new=True
-        for existing_number in existing_numbers:
-            if rand_number==existing_number:
-               is_new=False
-               while is_new==False:
-                    rand_number=random.randrange(100000000,999999999,1)
-                    is_new==True
-                    for existing_number in existing_numbers:
-                        if rand_number==existing_number:
-                            is_new=False
-        if is_new==True:
-            new_ids.append(int(rand_number))
-    return new_ids
-
-def generate_single_rand(existing_numbers):
-# This function gets less effective as the existing numbers list gets bigger. You should consider changing it to a more efficient one
-    import random
-    rand_number=random.randrange(100000000,999999999,1)
-    is_new=True
-    for existing_number in existing_numbers:
-        if rand_number==existing_number:
-           is_new=False
-           while is_new==False:
-                rand_number=random.randrange(100000000,999999999,1)
-                is_new==True
-                for existing_number in existing_numbers:
-                    if rand_number==existing_number:
-                        is_new=False
-    return int(rand_number)
-
-##############################################################################################################
-##############################################################################################################
-##############################################################################################################
 
 def prepare_data(uid,df_list,idn_df_list,subject_id_union,mycursor,mydb):
+    
+    import sys
+    sys.path.append(r'C:\Users\Matan\Documents\curiosity DB\scripts\EZDB\functions')
+    from ezdb_utils import generate_rand,generate_single_rand,run_sql
     import pandas as pd
     import math
     import itertools
     from update_tb_subjects import update_tb_subjects
-    
-    def run_sql (sql):
-        mycursor.execute(sql)
-
         
     #randomization process    
     if len(idn_df_list) == 0:

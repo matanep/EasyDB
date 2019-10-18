@@ -21,11 +21,11 @@ def manage_db(uid,action,exp_data,exp_metadata):
     mycursor = mydb.cursor()
     
     #Global parameters
-    mycursor.execute("SELECT subject_id_g FROM tb_subjects ORDER BY subject_id_g DESC LIMIT 1;")
-    subject_id_g_new = mycursor.fetchall()[0][0] 
+    subject_id_g_new = mycursor.fetchall(
+            mycursor.execute("SELECT subject_id_g FROM tb_subjects ORDER BY subject_id_g DESC LIMIT 1;")
+            )[0][0] 
     
     try:
-        ###need to add data_dict
         validate_data(uid,exp_data,mycursor,mydb)
     except:
         mycursor.close()

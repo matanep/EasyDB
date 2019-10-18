@@ -4,52 +4,13 @@ Created on Wed Oct 16 18:23:40 2019
 
 @author: Matan
 """
-def only_numerics(seq):
-    seq_type= type(seq)
-    return seq_type().join(filter(seq_type.isdigit, seq))
-
-def generate_single_rand(existing_numbers):
-# This function gets less effective as the existing numbers list gets bigger. You should consider changing it to a more efficient one
-    import random
-    rand_number=random.randrange(100000000,999999999,1)
-    is_new=True
-    for existing_number in existing_numbers:
-        if rand_number==existing_number:
-           is_new=False
-           while is_new==False:
-                rand_number=random.randrange(100000000,999999999,1)
-                is_new==True
-                for existing_number in existing_numbers:
-                    if rand_number==existing_number:
-                        is_new=False
-    return int(rand_number)
-
-##############################################################################################################
-##############################################################################################################
-##############################################################################################################    
         
 def update_tb_subjects(uid,subject_id_g_new,mycursor,mydb):    
-    def run_sql (sql):
-        mycursor.execute(sql)
     
-    def get_total_rows(table):
-            sql = "SELECT COUNT(*) FROM "+table+";"
-            mycursor.execute(sql)
-            total_rows = mycursor.fetchall() 
-            total_rows = total_rows[0][0]
-            return total_rows
+    import sys
+    sys.path.append(r'C:\Users\Matan\Documents\curiosity DB\scripts\EZDB\functions')
+    from ezdb_utils import only_numerics,generate_single_rand,run_sql,get_total_rows,is_exist
         
-    def is_exist(var,column,table):
-    # Get existing from the DB
-        mycursor.execute("SELECT "+column+" FROM "+table)
-        existing_vars=list(mycursor.fetchall())
-        for i in range(0,len(existing_vars)):
-            existing_vars[i]=existing_vars[i][0]
-        if var in(existing_vars):
-            return True
-        else:
-            return False
-    
     # add subject_id_g column to subjects_id_temp
     run_sql("ALTER TABLE "+uid+".`subjects_id_temp` ADD COLUMN `subject_id_g` INT(11) DEFAULT NULL FIRST;")
     
@@ -113,4 +74,3 @@ def update_tb_subjects(uid,subject_id_g_new,mycursor,mydb):
         # validate that the number enters tb_subjects only if it's new (including a new experiment)
         if not(is_exist(current_id_number,"subject_id_number","tb_subjects")): 
             run_sql("INSERT INTO "+uid+".`tb_subjects` (`subject_id_g`, `subject_id_number`, `is_real`) VALUES ('"+str(current_id_g)+"', '"+str(current_id_number)+"', '"+str(is_real)+"');")
-            #"INSERT INTO tb_subjects (SELECT subject_id_g, subject_id_number FROM subjects_id_temp);" - delete later            

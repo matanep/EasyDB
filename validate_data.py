@@ -4,95 +4,13 @@ Created on Wed Oct 16 18:15:44 2019
 
 @author: Matan
 """
-def make_df(path): 
-    import pandas as pd
-    return pd.read_csv(path)
-
-def correct_idn(idn):
-    import regex as re
-    return re.match(r'^([0-9]{9})+$', str(idn))
-
-def correct_id(id):
-    import regex as re
-    import math
-    
-    if type(id) == str:
-        if id == "":
-            return False
-        elif type(id) == int or type(id) == float:
-            if id == None:
-                return False
-        elif type(id).__module__ == 'numpy' and math.isnan(id):
-            return False
-
-    return re.match(r'^[0-9]+$', str(id))
-
-def validate_type(id_or_idn, df, file_name):
-    import math
-        
-    if id_or_idn == "id":
-        l = df['subject_id']
-    else:
-        l = df['subject_id_number']
-
-    for j in range(0, len(l)):
-        
-        idn = l[j]
-        
-        if (type(idn) == str) and not(idn==""):
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                    raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
-        
-        elif (type(idn).__module__ == 'numpy') and not(math.isnan(idn)):
-            idn = int(idn.item())
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
-                
-        elif type(idn) == float and not(idn==None):
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
-                
-        elif type(idn) == int and not(idn==None):
-            if id_or_idn == "id":
-                if not correct_id(idn):
-                    raise SystemExit("Not all subject ids in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            elif not correct_idn(idn):
-                raise SystemExit("Not all subject id numbers in " + str(file_name) + " are correct: " + str(idn)) ###logger
-            else: 
-                l[j] = int(l[j])
- 
-        elif (type(idn) == int and (idn==None)) or (type(idn) == float and (idn==None)) or ((type(idn).__module__ == 'numpy') and math.isnan(idn)) or ((type(idn) == str) and not(idn=="")):
-            if id_or_idn == "id":
-                raise SystemExit("Some ID numbers' in " + str(file_name) + " type are empty or unrecognized") ###logger                  
-
-        else:
-            try:
-                l[j] = int(l[j])
-            except ValueError:
-                raise SystemExit("Some ID numbers' in " + str(file_name) + " type are empty or unrecognized") ###logger
-
-##############################################################################################################
-##############################################################################################################
-##############################################################################################################
 
 def validate_data(uid,exp_data,mycursor,mydb):
     
-    import pandas as pd
+    import sys
+    sys.path.append(r'C:\Users\Matan\Documents\curiosity DB\scripts\EZDB\functions')
+    from ezdb_utils import validate_type
+    import pandas as pd 
     from prepare_data import prepare_data
          
     df_list = []

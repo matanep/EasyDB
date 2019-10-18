@@ -5,10 +5,6 @@ Created on Wed Oct 16 19:48:14 2019
 @author: Matan
 """
 
-########################################################################################################################
-########################################################################################################################
-########################################################################################################################
-
 def insert_tool(mycursor,
                 uid,
                 tool_name,
@@ -24,41 +20,10 @@ def insert_tool(mycursor,
                 experiment_owner,
                 experiment_owner_mail,
                 experiment_id_new_g):
-    
-#    import utilities as u
-    
-    def run_sql (sql):
-        mycursor.execute(sql)
-        
-    def get_total_rows(table):
-            sql = "SELECT COUNT(*) FROM "+table+";"
-            mycursor.execute(sql)
-            total_rows = mycursor.fetchall() 
-            total_rows = total_rows[0][0]
-            return total_rows
-       
-    def is_exist(var,column,table):
-    # Get existing from the DB
-        mycursor.execute("SELECT "+column+" FROM "+table)
-        existing_vars=list(mycursor.fetchall())
-        for i in range(0,len(existing_vars)):
-            existing_vars[i]=existing_vars[i][0]
-        if var in(existing_vars):
-            return True
-        else:
-            return False
-        
-    def remove_duplicates(tool_name,tbt):
-        run_sql("CREATE TABLE "+tool_name+"_temp LIKE "+tool_name+";")
-        if  tbt:
-            run_sql("INSERT INTO tb_tools_temp SELECT * FROM tb_tools GROUP BY tool_id,tool_name;")
-            run_sql("DROP TABLE tb_tools;")
-            run_sql("ALTER TABLE tb_tools_temp RENAME TO tb_tools;")
-        else:
-            run_sql("INSERT INTO "+tool_name+"_temp SELECT * FROM "+tool_name+" GROUP BY subject_id_g,subject_id,experiment_id;")    
-            run_sql("DROP TABLE "+tool_name+";")
-            run_sql("ALTER TABLE "+tool_name+"_temp RENAME TO "+tool_name+";")
-
+    import sys
+    sys.path.append(r'C:\Users\Matan\Documents\curiosity DB\scripts\EZDB\functions')
+    from ezdb_utils import run_sql,get_total_rows,is_exist,remove_duplicates
+   
     # Update tb_new with experiment_id and subject_id_number
     run_sql("ALTER TABLE "+uid+"."+tool_name+" ADD COLUMN `experiment_id` INT(11) NULL DEFAULT NULL AFTER `subject_id`;")
     run_sql("ALTER TABLE "+uid+"."+tool_name+" ADD COLUMN `subject_id_number` VARCHAR(45) NULL AFTER `subject_id`;")
