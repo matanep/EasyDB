@@ -90,11 +90,13 @@ def validate_type(id_or_idn, df, file_name):
 ##############################################################################################################
 ##############################################################################################################
 
-def validate_data(uid):
+def validate_data(uid,mycursor,mydb):
+    
+###need to add data_dict
     import os
     import pandas as pd
-    
-     #validations section - better move to the driver
+    from prepare_data import prepare_data
+
     path="testing files/CSV/"
     
     file_list = os.listdir(path) 
@@ -102,8 +104,6 @@ def validate_data(uid):
     ###should be changed to a JSON dictionary:
 #    data = [{'name': 'vikash', 'age': 27}, {'name': 'Satyam', 'age': 14}]
 #    df = pd.DataFrame.from_dict(data, orient='columns')
-    
-    ###Modify to a single df validation?
     
     df_list = []
     idn_df_list = []
@@ -159,3 +159,10 @@ def validate_data(uid):
         df2 = list(map(int, df2)) #convert back to int
         if df1 != df2:
            raise SystemExit(str(idn_name_list[i]) + " doesn't contain a unique subject_id_number column")  ###logger
+           
+    try:
+        prepare_data(uid,df_list,idn_df_list,subject_id_union,mycursor,mydb)
+    except:
+        mycursor.close()
+        mydb.close()
+        raise SystemExit("Problem with prepare_data")

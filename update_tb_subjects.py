@@ -28,8 +28,7 @@ def generate_single_rand(existing_numbers):
 ##############################################################################################################
 ##############################################################################################################    
         
-def update_tb_subjects(mycursor,uid,subject_id_g_new):
-    
+def update_tb_subjects(uid,subject_id_g_new,mycursor,mydb):    
     def run_sql (sql):
         mycursor.execute(sql)
     
@@ -64,6 +63,8 @@ def update_tb_subjects(mycursor,uid,subject_id_g_new):
     # the loop extarcts subject_id_number and inserts subject_id_g_new number accordingly
     id_g_counter = subject_id_g_new #highest id_g number in table
     subject_id_g_list = []
+    is_real_list = []
+    
     mycursor.execute("SELECT is_real FROM "+uid+".subjects_id_temp")
     is_real_list = mycursor.fetchall()
     
@@ -112,4 +113,4 @@ def update_tb_subjects(mycursor,uid,subject_id_g_new):
         # validate that the number enters tb_subjects only if it's new (including a new experiment)
         if not(is_exist(current_id_number,"subject_id_number","tb_subjects")): 
             run_sql("INSERT INTO "+uid+".`tb_subjects` (`subject_id_g`, `subject_id_number`, `is_real`) VALUES ('"+str(current_id_g)+"', '"+str(current_id_number)+"', '"+str(is_real)+"');")
-            #"INSERT INTO tb_subjects (SELECT subject_id_g, subject_id_number FROM subjects_id_temp);" - delete later
+            #"INSERT INTO tb_subjects (SELECT subject_id_g, subject_id_number FROM subjects_id_temp);" - delete later            

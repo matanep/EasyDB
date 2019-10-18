@@ -136,19 +136,15 @@ def generate_single_rand(existing_numbers):
 ##############################################################################################################
 ##############################################################################################################
 
-def prepare_data(uid,df_list,idn_df_list,subject_id_union):
-    import validate_data
+def prepare_data(uid,df_list,idn_df_list,subject_id_union,mycursor,mydb):
     import pandas as pd
     import math
     import itertools
-    import make_connection
+    from update_tb_subjects import update_tb_subjects
     
     def run_sql (sql):
         mycursor.execute(sql)
-    
-    validate_data()
-    
-    mycursor = make_connection.cursor()
+
         
     #randomization process    
     if len(idn_df_list) == 0:
@@ -215,7 +211,6 @@ def prepare_data(uid,df_list,idn_df_list,subject_id_union):
     ###Insert data into the DB
     subject_ids=[]
     subject_id_numbers=[]
-    is_real_list = []
     
     # exctract the top number to variable = subject_id_new
     mycursor.execute("SELECT subject_id_g FROM tb_subjects ORDER BY subject_id_g DESC LIMIT 1;")
@@ -250,3 +245,10 @@ def prepare_data(uid,df_list,idn_df_list,subject_id_union):
             
     sql = "INSERT INTO subjects_id_temp (subject_id, subject_id_number, is_real) VALUES (%s, %s, %s)"
     mycursor.executemany(sql, new_fields)
+    
+    try:
+        update_tb_subjects(uid,subject_id_g_new,mycursor,mydb)
+    except:
+        mycursor.close()
+        mydb.close()
+        raise SystemExit("Problem with update_tb_subjects")
